@@ -1,82 +1,359 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IoT IoT- assisted indoor air filtration system with self-cleaning PM filters</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#e8edf5;font:15px system-ui,Arial}header{padding:24px 4%;background:#101b2d;border-bottom:1px solid #293951}h1{margin:0;font-size:clamp(1.4rem,3vw,2rem)}header p,.muted{color:#9aabc2}.wrap{max-width:1400px;margin:auto;padding:22px 3%}.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}input,button{border-radius:8px;padding:11px 13px;border:1px solid #354760}input{background:#101b2d;color:white;min-width:250px}button{background:#4f8cff;color:white;font-weight:700;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:#131f32;border:1px solid #293951;border-radius:14px;padding:17px;min-width:0}.label{color:#a7b7ce;font-size:.88rem}.value{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:750;margin:12px 0;overflow-wrap:anywhere}.unit{font-size:.9rem;color:#9aabc2;font-weight:500}.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.section{margin:25px 0 12px}.chart{width:100%;height:190px}.state{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #293951}.state:last-child{border:0}.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.control{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#101b2d;border:1px solid #354760;border-radius:12px;padding:14px}.control-name{font-weight:700}.switch{position:relative;display:inline-block;width:54px;height:30px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0;min-width:0}.slider{position:absolute;inset:0;cursor:pointer;background:#526176;border-radius:30px;transition:.2s}.slider:before{content:"";position:absolute;width:22px;height:22px;left:4px;top:4px;background:#fff;border-radius:50%;transition:.2s}.switch input:checked+.slider{background:#21936b}.switch input:checked+.slider:before{transform:translateX(24px)}.switch input:focus-visible+.slider{outline:2px solid #75a7ff;outline-offset:3px}.control-state{font-size:.78rem;color:#9aabc2;margin-top:5px}.control-state.on{color:#9de3c4}.control-state.off{color:#ffd39b}.endpoint{width:100%;min-width:0}.control-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}.badge{display:inline-block;border-radius:99px;padding:5px 10px;background:#203650}.ok{background:#153b32;color:#9de3c4}.warn{background:#4a3520;color:#ffd39b}.note{font-size:.83rem;line-height:1.5;color:#9aabc2;margin-top:16px}@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:450px){.controls{grid-template-columns:1fr}.grid{gap:8px}.card{padding:12px}.value{font-size:1.35rem}input{width:100%;min-width:0}}
-</style></head><body>
-<header><h1>IoT- assisted indoor air filtration system with self-cleaning PM filters</h1><p>Live ThingSpeak monitoring · Channel ID: <b>3521125</b></p></header>
-<main class="wrap">
-<div class="bar"><input id="key" type="password" autocomplete="off" placeholder="Read API key (private channel only)"><button onclick="saveReadKey()">Save key</button><button onclick="load()">Connect / Refresh</button><button onclick="forgetReadKey()" style="background:#354760">Forget saved key</button><span id="status" class="muted">Loading channel…</span></div>
-<div class="grid">
-<div class="card"><div class="label">PM2.5 </div><div class="value" id="v1">— <span class="unit">µg/m³</span></div></div>
-<div class="card"><div class="label">PM10 </div><div class="value" id="v2">— <span class="unit">µg/m³</span></div></div>
-<div class="card"><div class="label">Temperature </div><div class="value" id="v3">— <span class="unit">°C</span></div></div>
-<div class="card"><div class="label">Relative humidity </div><div class="value" id="v4">— <span class="unit">%</span></div></div>
-<div class="card"><div class="label">Differential pressure </div><div class="value" id="v5">— <span class="unit">Pa</span></div></div>
-<div class="card"><div class="label">Filtration blower </div><div class="value" id="v6">— <span class="unit">%</span></div></div>
-<div class="card"><div class="label">System status </div><div class="value" id="v7" style="font-size:1.25rem">—</div><div class="muted">0 Startup · 1 Diagnostic · 2 Monitoring · 3 Cleaning · 4 UV-C · 5 Fault</div></div>
-<div class="card"><div class="label">Cleaning status </div><div class="value" id="v8" style="font-size:1.4rem">—</div><div class="muted">0 Inactive · 1 Active</div></div>
-</div>
-<h2 class="section">All 8 trends (last 20 entries)</h2><div class="charts">
-<div class="card"><b>PM2.5 (µg/m³)</b><div id="c1"></div></div>
-<div class="card"><b>PM10 (µg/m³)</b><div id="c2"></div></div>
-<div class="card"><b>Temperature (°C)</b><div id="c3"></div></div>
-<div class="card"><b>Relative humidity (%)</b><div id="c4"></div></div>
-<div class="card"><b>Differential pressure (Pa)</b><div id="c5"></div></div>
-<div class="card"><b>Filtration blower speed (%)</b><div id="c6"></div></div>
-<div class="card"><b>System status (code)</b><div id="c7"></div></div>
-<div class="card"><b>Cleaning status (0/1)</b><div id="c8"></div></div>
-</div>
-<h2 class="section">ThingSpeak fields</h2>
-<div class="card" style="overflow-x:auto">
-<table style="width:100%;border-collapse:collapse;text-align:left">
-<thead><tr><th style="padding:10px;border-bottom:1px solid #354760">Field</th><th style="padding:10px;border-bottom:1px solid #354760">Parameter</th><th style="padding:10px;border-bottom:1px solid #354760">Latest value</th></tr></thead>
-<tbody>
-<tr><td style="padding:10px">1</td><td>PM2.5</td><td id="table1">—</td></tr>
-<tr><td style="padding:10px">2</td><td>PM10</td><td id="table2">—</td></tr>
-<tr><td style="padding:10px">3</td><td>Temperature</td><td id="table3">—</td></tr>
-<tr><td style="padding:10px">4</td><td>Relative humidity</td><td id="table4">—</td></tr>
-<tr><td style="padding:10px">5</td><td>Differential pressure</td><td id="table5">—</td></tr>
-<tr><td style="padding:10px">6</td><td>Filtration blower speed</td><td id="table6">—</td></tr>
-<tr><td style="padding:10px">7</td><td>System status</td><td id="table7">—</td></tr>
-<tr><td style="padding:10px">8</td><td>Cleaning status</td><td id="table8">—</td></tr>
-</tbody></table></div>
-<h2 class="section">Equipment controls</h2>
-<div class="card">
-  <p class="muted" style="margin-top:0">Switches send commands only when a compatible control API endpoint is configured below. The existing ThingSpeak channel is currently used for monitoring, so these switches will not operate the physical ESP32 until command handling is connected.</p>
-  <div class="controls">
-    <div class="control"><div><div class="control-name">Total system</div><div class="control-state off" id="state-total">OFF</div></div><label class="switch" aria-label="Total system"><input type="checkbox" id="ctl-total" data-device="total" onchange="controlChanged(this)"><span class="slider"></span></label></div>
-    <div class="control"><div><div class="control-name">Filtration blower</div><div class="control-state off" id="state-filtration_blower">OFF</div></div><label class="switch" aria-label="Filtration blower"><input type="checkbox" id="ctl-filtration_blower" data-device="filtration_blower" onchange="controlChanged(this)"><span class="slider"></span></label></div>
-    <div class="control"><div><div class="control-name">UV-C</div><div class="control-state off" id="state-uv_c">OFF</div></div><label class="switch" aria-label="UV-C"><input type="checkbox" id="ctl-uv_c" data-device="uv_c" onchange="controlChanged(this)"><span class="slider"></span></label></div>
-    <div class="control"><div><div class="control-name">Cleaning blower</div><div class="control-state off" id="state-cleaning_blower">OFF</div></div><label class="switch" aria-label="Cleaning blower"><input type="checkbox" id="ctl-cleaning_blower" data-device="cleaning_blower" onchange="controlChanged(this)"><span class="slider"></span></label></div>
-    <div class="control"><div><div class="control-name">Vibration motor</div><div class="control-state off" id="state-vibration">OFF</div></div><label class="switch" aria-label="Vibration motor"><input type="checkbox" id="ctl-vibration" data-device="vibration" onchange="controlChanged(this)"><span class="slider"></span></label></div>
-  </div>
-  <div class="card" style="margin-top:14px;background:#101b2d">
-    <div class="control-name">Filtration blower speed</div>
-    <p class="muted" style="margin:6px 0 12px">24 V DC, 1 A blower · relay for power ON/OFF · MOSFET for supply-side PWM speed control</p>
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <input id="blowerSpeed" type="range" min="0" max="100" step="5" value="70" style="flex:1;min-width:180px" oninput="document.getElementById('blowerSpeedLabel').textContent=this.value+'%'">
-      <b id="blowerSpeedLabel">70%</b>
-      <button onclick="setFiltrationSpeed()">Apply speed</button>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Air Filtration Monitoring</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #101827;
+      color: #edf3fc;
+    }
+
+    .dashboard {
+      max-width: 760px;
+      margin: auto;
+    }
+
+    header {
+      padding: 4px 2px 16px;
+      border-bottom: 1px solid #2c3b50;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      color: #90a9c9;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(21px, 4vw, 28px);
+      margin: 8px 0;
+    }
+
+    .subtitle {
+      color: #a4b4ca;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #aabbd0;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #eab858;
+      flex-shrink: 0;
+    }
+
+    .dot.ok { background: #35d399; }
+    .dot.error { background: #fb7185; }
+
+    .section-title {
+      color: #90a9c9;
+      font-size: 11px;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      margin: 18px 0 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 11px;
+    }
+
+    .card {
+      min-width: 0;
+      background: #192438;
+      border: 1px solid #2b3b53;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      color: #a5b7ce;
+      font-size: 12px;
+      line-height: 1.4;
+      min-height: 30px;
+    }
+
+    .value-line {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .value {
+      font-size: clamp(23px, 4vw, 31px);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .unit {
+      color: #a5b7ce;
+      font-size: 12px;
+    }
+
+    .status-value {
+      font-size: 18px;
+      line-height: 1.4;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      margin-top: 14px;
+      padding: 12px;
+      background: #192438;
+      border: 1px solid #2b3b53;
+      border-radius: 10px;
+      color: #a5b7ce;
+      font-size: 11px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .error-text { color: #fda4af; }
+
+    @media (max-width: 300px) {
+      body { padding: 8px; }
+      .grid { grid-template-columns: 1fr; }
+      .card.wide { grid-column: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="dashboard">
+    <header>
+      <div class="eyebrow">IoT Monitoring</div>
+      <h1>Air Filtration System</h1>
+      <div class="subtitle">
+        Live telemetry from ThingSpeak channel 3521125
+      </div>
+
+      <div class="connection">
+        <span id="dot" class="dot"></span>
+        <span id="connectionText">Connecting to ThingSpeak...</span>
+      </div>
+    </header>
+
+    <div class="section-title">Air quality and environment</div>
+
+    <section class="grid">
+      <article class="card">
+        <div class="label">Field 1 · PM2.5</div>
+        <div class="value-line">
+          <span class="value" id="f1">--</span>
+          <span class="unit">µg/m³</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="label">Field 2 · PM10</div>
+        <div class="value-line">
+          <span class="value" id="f2">--</span>
+          <span class="unit">µg/m³</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="label">Field 3 · Temperature</div>
+        <div class="value-line">
+          <span class="value" id="f3">--</span>
+          <span class="unit">°C</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="label">Field 4 · Relative humidity</div>
+        <div class="value-line">
+          <span class="value" id="f4">--</span>
+          <span class="unit">%</span>
+        </div>
+      </article>
+    </section>
+
+    <div class="section-title">System performance</div>
+
+    <section class="grid">
+      <article class="card">
+        <div class="label">Field 5 · Differential pressure</div>
+        <div class="value-line">
+          <span class="value" id="f5">--</span>
+          <span class="unit">Pa*</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="label">Field 6 · Filtration blower speed</div>
+        <div class="value-line">
+          <span class="value" id="f6">--</span>
+          <span class="unit" id="u6">raw value</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="label">Field 7 · System status</div>
+        <div class="value-line">
+          <span class="status-value" id="f7">Awaiting data</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="label">Field 8 · Cleaning status</div>
+        <div class="value-line">
+          <span class="status-value" id="f8">Awaiting data</span>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer">
+      <div id="updated">Last ThingSpeak entry: --</div>
+      <div id="refresh">Refresh interval: 20 seconds</div>
+      <div id="message">Waiting for the first data response.</div>
     </div>
-  </div>
-  <div class="control-actions"><input class="endpoint" id="controlEndpoint" type="url" placeholder="Secure control endpoint URL (HTTPS)"><input class="endpoint" id="controlAccessToken" type="password" autocomplete="off" placeholder="Dashboard access token"><button onclick="saveControlEndpoint()">Connect controls</button><span id="controlStatus" class="muted" role="status">Hardware control not connected</span></div>
-  <p class="note">The endpoint must accept authenticated JSON POST requests. Switches use {"device":"filtration_blower","state":"ON"}; speed uses {"device":"filtration_speed","value":70} with a value from 0 to 100. The filtration blower relay handles power ON/OFF and the MOSFET handles PWM. Enter the endpoint URL and access token supplied during secure setup. UV-C and cleaning commands must remain subject to firmware safety interlocks.</p>
-</div>
-<div class="card section"><b>Latest feed record</b><div class="state"><span class="muted">Entry ID</span><b id="entry">—</b></div><div class="state"><span class="muted">Timestamp</span><b id="time">—</b></div><div class="state"><span class="muted">Connection</span><b id="conn">Waiting</b></div><p class="note">Refreshes every 20 seconds. This is a read-only dashboard; it does not control the ESP32. For a private channel, enter the ThingSpeak Read API Key and select <b>Save key</b> once. The key is stored only in this browser using local storage; it is not embedded in the public GitHub source. Anyone with access to this browser profile may be able to use the saved key. Use <b>Forget saved key</b> to remove it from this browser.</p></div>
-</main>
-<script>
-const id='3521125', names={0:'Startup test',1:'Self-diagnostic',2:'Normal monitoring',3:'Cleaning active',4:'UV-C safety / treatment',5:'Fault'};
-function metric(n,v,u){document.getElementById('v'+n).innerHTML=(v===null||v===''||!Number.isFinite(Number(v))?'—':Number(v).toFixed(1))+' <span class="unit">'+u+'</span>'}
-function chart(el,feeds,field){let vals=feeds.map(x=>Number(x[field])).filter(Number.isFinite),box=document.getElementById(el);if(vals.length<2){box.innerHTML='<p class="muted">Waiting for more data…</p>';return}let min=Math.min(...vals),max=Math.max(...vals),r=max-min||1,pts=vals.map((v,i)=>(10+i*580/(vals.length-1))+','+(170-(v-min)/r*145)).join(' ');box.innerHTML='<svg class="chart" viewBox="0 0 600 190" role="img"><line x1="10" y1="170" x2="590" y2="170" stroke="#354760"/><polyline points="'+pts+'" fill="none" stroke="#75a7ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><text x="10" y="14" fill="#9aabc2" font-size="12">'+max.toFixed(1)+'</text><text x="10" y="187" fill="#9aabc2" font-size="12">'+min.toFixed(1)+'</text></svg>'}
-const READ_KEY_STORAGE='iotAirFiltrationThingSpeakReadKey';
-function saveReadKey(){const key=document.getElementById('key').value.trim(),s=document.getElementById('status');if(!key){s.textContent='Enter the read-only key before saving';return;}try{localStorage.setItem(READ_KEY_STORAGE,key);s.textContent='Read API key saved in this browser';load();}catch(e){s.textContent='Browser storage unavailable; enter the key for this session';}}
-function forgetReadKey(){try{localStorage.removeItem(READ_KEY_STORAGE);}catch(e){}document.getElementById('key').value='';document.getElementById('status').textContent='Saved key removed from this browser';load();}
-async function load(){let key=document.getElementById('key').value.trim();if(!key){try{key=localStorage.getItem(READ_KEY_STORAGE)||'';}catch(e){}}let url='https://api.thingspeak.com/channels/'+id+'/feeds.json?results=20'+(key?'&api_key='+encodeURIComponent(key):'');let s=document.getElementById('status');s.textContent='Loading…';try{let r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);let d=await r.json();if(!d.feeds||!d.feeds.length)throw Error('No feed data. Check channel privacy and Read API Key.');let f=d.feeds[d.feeds.length-1];[[1,'field1','µg/m³'],[2,'field2','µg/m³'],[3,'field3','°C'],[4,'field4','%'],[5,'field5','Pa'],[6,'field6','%']].forEach(a=>{metric(a[0],f[a[1]],a[2]);document.getElementById('table'+a[0]).textContent=(f[a[1]]==null?'No data':f[a[1]]+' '+a[2])});let st=f.field7;let stText=st==null?'No data':(names[Math.round(Number(st))]||'Unknown ('+st+')');document.getElementById('v7').textContent=stText;document.getElementById('table7').textContent=st==null?'No data':st+' — '+stText;let cl=f.field8;let clText=cl==null?'No data':(Number(cl)===1?'ACTIVE':'INACTIVE');document.getElementById('v8').innerHTML=cl==null?'No data':'<span class="badge '+(Number(cl)===1?'warn':'ok')+'">'+clText+'</span>';document.getElementById('table8').textContent=cl==null?'No data':cl+' — '+clText;document.getElementById('entry').textContent=f.entry_id||'—';document.getElementById('time').textContent=f.created_at?new Date(f.created_at).toLocaleString():'—';document.getElementById('conn').innerHTML='<span class="badge ok">Connected</span>';[['c1','field1'],['c2','field2'],['c3','field3'],['c4','field4'],['c5','field5'],['c6','field6'],['c7','field7'],['c8','field8']].forEach(a=>chart(a[0],d.feeds,a[1]));s.textContent='Updated '+new Date().toLocaleTimeString()}catch(e){s.textContent='Could not load: '+e.message;document.getElementById('conn').textContent='Check settings'}}
-let controlEndpoint='',controlAccessToken='';
-function saveControlEndpoint(){const raw=document.getElementById('controlEndpoint').value.trim(),token=document.getElementById('controlAccessToken').value.trim();try{const u=new URL(raw);if(u.protocol!=='https:'||!token)throw Error();controlEndpoint=u.href;controlAccessToken=token;document.getElementById('controlStatus').textContent='Secure endpoint configured for this page session';}catch(e){controlEndpoint='';controlAccessToken='';document.getElementById('controlStatus').textContent='Enter a valid HTTPS endpoint and access token';}}
-async function postControl(payload){if(!controlEndpoint||!controlAccessToken)throw Error('Connect the secure control endpoint first.');const response=await fetch(controlEndpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+controlAccessToken},body:JSON.stringify({...payload,source:'iot-air-filtration-dashboard'}),mode:'cors'});if(!response.ok)throw Error('HTTP '+response.status);const result=await response.json();if(!result.ok)throw Error(result.error||'Command rejected');return result;}
-async function controlChanged(el){const device=el.dataset.device,state=el.checked?'ON':'OFF',status=document.getElementById('controlStatus'),stateEl=document.getElementById('state-'+device);el.disabled=true;status.textContent='Sending '+device+' '+state+'…';try{await postControl({device,state});stateEl.textContent=state;stateEl.className='control-state '+(state==='ON'?'on':'off');status.textContent='Command request accepted for '+device+' '+state+'; physical state is not independently confirmed.';}catch(e){el.checked=!el.checked;status.textContent='Command failed: '+e.message;}finally{el.disabled=false;}}
-async function setFiltrationSpeed(){const slider=document.getElementById('blowerSpeed'),status=document.getElementById('controlStatus'),value=Number(slider.value);status.textContent='Sending filtration blower speed '+value+'%…';try{await postControl({device:'filtration_speed',value});status.textContent='PWM speed request accepted: '+value+'%; physical speed is not independently confirmed.';}catch(e){status.textContent='Speed command failed: '+e.message;}}
-try{const savedKey=localStorage.getItem(READ_KEY_STORAGE);if(savedKey)document.getElementById('key').value=savedKey;}catch(e){}load();setInterval(load,20000);
-</script></body></html>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const CHANNEL_ID = "3521125";
+
+      // Leave blank for a public ThingSpeak channel.
+      // For a private channel, enter its READ API key here.
+      // Never use the ThingSpeak WRITE API key.
+      const READ_API_KEY = "";
+
+      const REFRESH_MS = 20000;
+
+      const endpoint =
+        `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1`;
+
+      const dot = document.getElementById("dot");
+      const connectionText =
+        document.getElementById("connectionText");
+      const message = document.getElementById("message");
+
+      function showConnection(state, text) {
+        dot.className = "dot" +
+          (state === "ok" ? " ok" :
+           state === "error" ? " error" : "");
+        connectionText.textContent = text;
+      }
+
+      function display(id, value) {
+        document.getElementById(id).textContent =
+          value === null || value === undefined ||
+          String(value).trim() === ""
+            ? "--"
+            : String(value);
+      }
+
+      function formatTimestamp(value) {
+        if (!value) return "--";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) return value;
+
+        return date.toLocaleString();
+      }
+
+      async function updateDashboard() {
+        try {
+          // Blynk may restrict external network requests.
+          if (typeof BlynkBridge !== "undefined") {
+            const bridge = new BlynkBridge({
+              logEnabled: false,
+              isOnErrorEnabled: false
+            });
+
+            if (!bridge.isExternalRequestsAllowed()) {
+              showConnection("error", "External requests blocked");
+              message.textContent =
+                "This Blynk environment blocks direct ThingSpeak requests. " +
+                "Use an approved proxy or a supported embed.";
+              return;
+            }
+          }
+
+          const url = new URL(endpoint);
+
+          if (READ_API_KEY.trim() !== "") {
+            url.searchParams.set("api_key", READ_API_KEY.trim());
+          }
+
+          const response = await fetch(url.toString(), {
+            method: "GET",
+            cache: "no-store"
+          });
+
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+          }
+
+          const data = await response.json();
+
+          if (!Array.isArray(data.feeds) ||
+              data.feeds.length === 0) {
+            throw new Error(
+              "No entries found. Check channel access and logging."
+            );
+          }
+
+          const feed = data.feeds[data.feeds.length - 1];
+
+          for (let i = 1; i <= 8; i++) {
+            display("f" + i, feed["field" + i]);
+          }
+
+          document.getElementById("updated").textContent =
+            "Last ThingSpeak entry: " +
+            formatTimestamp(feed.created_at);
+
+          showConnection("ok", "ThingSpeak data received");
+          message.textContent =
+            "Latest entry loaded successfully.";
+
+        } catch (error) {
+          showConnection("error", "Unable to load ThingSpeak data");
+          message.textContent =
+            error && error.message
+              ? error.message
+              : "Check network access, channel privacy, and API key.";
+        }
+      }
+
+      updateDashboard();
+      setInterval(updateDashboard, REFRESH_MS);
+    })();
+  </script>
+</body>
+</html>
