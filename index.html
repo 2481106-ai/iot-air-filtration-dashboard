@@ -8,14 +8,14 @@
 <main class="wrap">
 <div class="bar"><input id="key" type="password" placeholder="Read API key (private channel only)"><button onclick="load()">Connect / Refresh</button><span id="status" class="muted">Loading channel…</span></div>
 <div class="grid">
-<div class="card"><div class="label">PM2.5 · 1</div><div class="value" id="v1">— <span class="unit">µg/m³</span></div></div>
-<div class="card"><div class="label">PM10 · 2</div><div class="value" id="v2">— <span class="unit">µg/m³</span></div></div>
-<div class="card"><div class="label">Temperature · 3</div><div class="value" id="v3">— <span class="unit">°C</span></div></div>
-<div class="card"><div class="label">Relative humidity · 4</div><div class="value" id="v4">— <span class="unit">%</span></div></div>
-<div class="card"><div class="label">Differential pressure · 5</div><div class="value" id="v5">— <span class="unit">Pa</span></div></div>
-<div class="card"><div class="label">Filtration blower · 6</div><div class="value" id="v6">— <span class="unit">%</span></div></div>
-<div class="card"><div class="label">System status · 7</div><div class="value" id="v7" style="font-size:1.25rem">—</div><div class="muted">0 Startup · 1 Diagnostic · 2 Monitoring · 3 Cleaning · 4 UV-C · 5 Fault</div></div>
-<div class="card"><div class="label">Cleaning status · 8</div><div class="value" id="v8" style="font-size:1.4rem">—</div><div class="muted">0 Inactive · 1 Active</div></div>
+<div class="card"><div class="label">PM2.5 </div><div class="value" id="v1">— <span class="unit">µg/m³</span></div></div>
+<div class="card"><div class="label">PM10 </div><div class="value" id="v2">— <span class="unit">µg/m³</span></div></div>
+<div class="card"><div class="label">Temperature </div><div class="value" id="v3">— <span class="unit">°C</span></div></div>
+<div class="card"><div class="label">Relative humidity </div><div class="value" id="v4">— <span class="unit">%</span></div></div>
+<div class="card"><div class="label">Differential pressure </div><div class="value" id="v5">— <span class="unit">Pa</span></div></div>
+<div class="card"><div class="label">Filtration blower </div><div class="value" id="v6">— <span class="unit">%</span></div></div>
+<div class="card"><div class="label">System status </div><div class="value" id="v7" style="font-size:1.25rem">—</div><div class="muted">0 Startup · 1 Diagnostic · 2 Monitoring · 3 Cleaning · 4 UV-C · 5 Fault</div></div>
+<div class="card"><div class="label">Cleaning status </div><div class="value" id="v8" style="font-size:1.4rem">—</div><div class="muted">0 Inactive · 1 Active</div></div>
 </div>
 <h2 class="section">ThingSpeak fields</h2>
 <div class="card" style="overflow-x:auto">
@@ -32,14 +32,14 @@
 <tr><td style="padding:10px">8</td><td>Cleaning status</td><td id="table8">—</td></tr>
 </tbody></table></div>
 <h2 class="section">All 8 trends (last 20 entries)</h2><div class="charts">
-<div class="card"><b>PM2.5 · 1 (µg/m³)</b><div id="c1"></div></div>
-<div class="card"><b>PM10 · 2 (µg/m³)</b><div id="c2"></div></div>
-<div class="card"><b>Temperature · 3 (°C)</b><div id="c3"></div></div>
-<div class="card"><b>Relative humidity · 4 (%)</b><div id="c4"></div></div>
-<div class="card"><b>Differential pressure · 5 (Pa)</b><div id="c5"></div></div>
-<div class="card"><b>Filtration blower speed · 6 (%)</b><div id="c6"></div></div>
-<div class="card"><b>System status · 7 (code)</b><div id="c7"></div></div>
-<div class="card"><b>Cleaning status · 8 (0/1)</b><div id="c8"></div></div>
+<div class="card"><b>PM2.5 (µg/m³)</b><div id="c1"></div></div>
+<div class="card"><b>PM10 (µg/m³)</b><div id="c2"></div></div>
+<div class="card"><b>Temperature (°C)</b><div id="c3"></div></div>
+<div class="card"><b>Relative humidity (%)</b><div id="c4"></div></div>
+<div class="card"><b>Differential pressure (Pa)</b><div id="c5"></div></div>
+<div class="card"><b>Filtration blower speed (%)</b><div id="c6"></div></div>
+<div class="card"><b>System status (code)</b><div id="c7"></div></div>
+<div class="card"><b>Cleaning status (0/1)</b><div id="c8"></div></div>
 </div>
 <div class="card section"><b>Latest feed record</b><div class="state"><span class="muted">Entry ID</span><b id="entry">—</b></div><div class="state"><span class="muted">Timestamp</span><b id="time">—</b></div><div class="state"><span class="muted">Connection</span><b id="conn">Waiting</b></div><p class="note">Refreshes every 20 seconds. This is a read-only dashboard; it does not control the ESP32. For a private channel, enter the channel Read API Key. The key is not saved by this page. For a public online deployment, avoid embedding a private key in public source code.</p></div>
 </main>
