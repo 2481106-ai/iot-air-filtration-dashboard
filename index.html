@@ -1,359 +1,194 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-  <title>Air Filtration Monitoring</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #101827;
-      color: #edf3fc;
-    }
-
-    .dashboard {
-      max-width: 760px;
-      margin: auto;
-    }
-
-    header {
-      padding: 4px 2px 16px;
-      border-bottom: 1px solid #2c3b50;
-      margin-bottom: 16px;
-    }
-
-    .eyebrow {
-      color: #90a9c9;
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-size: clamp(21px, 4vw, 28px);
-      margin: 8px 0;
-    }
-
-    .subtitle {
-      color: #a4b4ca;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .connection {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-top: 12px;
-      font-size: 12px;
-      color: #aabbd0;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #eab858;
-      flex-shrink: 0;
-    }
-
-    .dot.ok { background: #35d399; }
-    .dot.error { background: #fb7185; }
-
-    .section-title {
-      color: #90a9c9;
-      font-size: 11px;
-      letter-spacing: 1.3px;
-      text-transform: uppercase;
-      margin: 18px 0 10px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 11px;
-    }
-
-    .card {
-      min-width: 0;
-      background: #192438;
-      border: 1px solid #2b3b53;
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .card.wide {
-      grid-column: 1 / -1;
-    }
-
-    .label {
-      color: #a5b7ce;
-      font-size: 12px;
-      line-height: 1.4;
-      min-height: 30px;
-    }
-
-    .value-line {
-      display: flex;
-      align-items: baseline;
-      gap: 5px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    .value {
-      font-size: clamp(23px, 4vw, 31px);
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-
-    .unit {
-      color: #a5b7ce;
-      font-size: 12px;
-    }
-
-    .status-value {
-      font-size: 18px;
-      line-height: 1.4;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-
-    .footer {
-      margin-top: 14px;
-      padding: 12px;
-      background: #192438;
-      border: 1px solid #2b3b53;
-      border-radius: 10px;
-      color: #a5b7ce;
-      font-size: 11px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    .error-text { color: #fda4af; }
-
-    @media (max-width: 300px) {
-      body { padding: 8px; }
-      .grid { grid-template-columns: 1fr; }
-      .card.wide { grid-column: auto; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IoT-Assisted Indoor Air Filtration System</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#e8edf5;font:15px system-ui,Arial,sans-serif}
+header{padding:24px 4%;background:#101b2d;border-bottom:1px solid #293951}
+h1{margin:0;font-size:clamp(1.4rem,3vw,2rem)}
+header p,.muted{color:#9aabc2}
+.wrap{max-width:1400px;margin:auto;padding:22px 3%}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{background:#131f32;border:1px solid #293951;border-radius:14px;padding:17px;min-width:0}
+.label{color:#a7b7ce;font-size:.88rem}
+.value{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:750;margin:12px 0;overflow-wrap:anywhere}
+.unit{font-size:.9rem;color:#9aabc2;font-weight:500}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.section{margin:25px 0 12px}
+.chart{width:100%;height:190px}
+.badge{display:inline-block;border-radius:99px;padding:5px 10px;background:#203650}
+.ok{background:#153b32;color:#9de3c4}
+.warn{background:#4a3520;color:#ffd39b}
+.note{font-size:.83rem;line-height:1.5;color:#9aabc2;margin-top:16px}
+table{width:100%;border-collapse:collapse;text-align:left}
+th,td{padding:10px;border-bottom:1px solid #293951}
+.state{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #293951}
+.state:last-child{border:0}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}}
+@media(max-width:450px){.grid{gap:8px}.card{padding:12px}.value{font-size:1.35rem}}
+</style>
 </head>
-
 <body>
-  <main class="dashboard">
-    <header>
-      <div class="eyebrow">IoT Monitoring</div>
-      <h1>Air Filtration System</h1>
-      <div class="subtitle">
-        Live telemetry from ThingSpeak channel 3521125
-      </div>
+<header>
+  <h1>IoT-Assisted Indoor Air Filtration System with Self-Cleaning PM Filters</h1>
+  <p>Live, read-only ThingSpeak monitoring · Channel ID: <b>3521125</b></p>
+</header>
+<main class="wrap">
+  <div class="grid">
+    <div class="card"><div class="label">PM2.5</div><div class="value" id="v1">— <span class="unit">µg/m³</span></div></div>
+    <div class="card"><div class="label">PM10</div><div class="value" id="v2">— <span class="unit">µg/m³</span></div></div>
+    <div class="card"><div class="label">Temperature</div><div class="value" id="v3">— <span class="unit">°C</span></div></div>
+    <div class="card"><div class="label">Relative humidity</div><div class="value" id="v4">— <span class="unit">%</span></div></div>
+    <div class="card"><div class="label">Differential pressure</div><div class="value" id="v5">— <span class="unit">Pa</span></div></div>
+    <div class="card"><div class="label">Filtration blower speed</div><div class="value" id="v6">— <span class="unit">%</span></div></div>
+    <div class="card"><div class="label">System status</div><div class="value" id="v7" style="font-size:1.25rem">—</div><div class="muted">0 Startup · 1 Diagnostic · 2 Monitoring · 3 Cleaning · 4 UV-C · 5 Fault</div></div>
+    <div class="card"><div class="label">Cleaning status</div><div class="value" id="v8" style="font-size:1.4rem">—</div><div class="muted">0 Inactive · 1 Active</div></div>
+  </div>
 
-      <div class="connection">
-        <span id="dot" class="dot"></span>
-        <span id="connectionText">Connecting to ThingSpeak...</span>
-      </div>
-    </header>
+  <h2 class="section">All 8 trends (last 20 entries)</h2>
+  <div class="charts">
+    <div class="card"><b>PM2.5 (µg/m³)</b><div id="c1"></div></div>
+    <div class="card"><b>PM10 (µg/m³)</b><div id="c2"></div></div>
+    <div class="card"><b>Temperature (°C)</b><div id="c3"></div></div>
+    <div class="card"><b>Relative humidity (%)</b><div id="c4"></div></div>
+    <div class="card"><b>Differential pressure (Pa)</b><div id="c5"></div></div>
+    <div class="card"><b>Filtration blower speed (%)</b><div id="c6"></div></div>
+    <div class="card"><b>System status (code)</b><div id="c7"></div></div>
+    <div class="card"><b>Cleaning status (0/1)</b><div id="c8"></div></div>
+  </div>
 
-    <div class="section-title">Air quality and environment</div>
+  <h2 class="section">ThingSpeak fields</h2>
+  <div class="card" style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Field</th><th>Parameter</th><th>Latest value</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>PM2.5</td><td id="table1">—</td></tr>
+        <tr><td>2</td><td>PM10</td><td id="table2">—</td></tr>
+        <tr><td>3</td><td>Temperature</td><td id="table3">—</td></tr>
+        <tr><td>4</td><td>Relative humidity</td><td id="table4">—</td></tr>
+        <tr><td>5</td><td>Differential pressure</td><td id="table5">—</td></tr>
+        <tr><td>6</td><td>Filtration blower speed</td><td id="table6">—</td></tr>
+        <tr><td>7</td><td>System status</td><td id="table7">—</td></tr>
+        <tr><td>8</td><td>Cleaning status</td><td id="table8">—</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-    <section class="grid">
-      <article class="card">
-        <div class="label">Field 1 · PM2.5</div>
-        <div class="value-line">
-          <span class="value" id="f1">--</span>
-          <span class="unit">µg/m³</span>
-        </div>
-      </article>
+  <div class="card section">
+    <b>Latest feed record</b>
+    <div class="state"><span class="muted">Entry ID</span><b id="entry">—</b></div>
+    <div class="state"><span class="muted">Timestamp</span><b id="time">—</b></div>
+    <div class="state"><span class="muted">Connection</span><b id="conn">Waiting</b></div>
+    <p class="note">This dashboard reads the public ThingSpeak channel and does not control the ESP32. It refreshes every 20 seconds. A Read API Key is not required while the channel remains public. If the channel is made private, use the channel's Read API Key and update the API URL in the code.</p>
+  </div>
+</main>
 
-      <article class="card">
-        <div class="label">Field 2 · PM10</div>
-        <div class="value-line">
-          <span class="value" id="f2">--</span>
-          <span class="unit">µg/m³</span>
-        </div>
-      </article>
+<script>
+'use strict';
 
-      <article class="card">
-        <div class="label">Field 3 · Temperature</div>
-        <div class="value-line">
-          <span class="value" id="f3">--</span>
-          <span class="unit">°C</span>
-        </div>
-      </article>
+const CHANNEL_ID = '3521125';
+const RESULTS = 20;
+const REFRESH_MS = 20000;
+// Public-channel read endpoint: no API key is required.
+const FEEDS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${RESULTS}`;
 
-      <article class="card">
-        <div class="label">Field 4 · Relative humidity</div>
-        <div class="value-line">
-          <span class="value" id="f4">--</span>
-          <span class="unit">%</span>
-        </div>
-      </article>
-    </section>
+const STATUS_NAMES = {
+  0: 'Startup test',
+  1: 'Self-diagnostic',
+  2: 'Normal monitoring',
+  3: 'Cleaning active',
+  4: 'UV-C safety / treatment',
+  5: 'Fault'
+};
+const FIELDS = [
+  {n:1,key:'field1',unit:'µg/m³'},
+  {n:2,key:'field2',unit:'µg/m³'},
+  {n:3,key:'field3',unit:'°C'},
+  {n:4,key:'field4',unit:'%'},
+  {n:5,key:'field5',unit:'Pa'},
+  {n:6,key:'field6',unit:'%'}
+];
 
-    <div class="section-title">System performance</div>
+function numericValue(value) {
+  if (value === null || value === undefined || value === '' || !Number.isFinite(Number(value))) return null;
+  return Number(value);
+}
+function showMetric(n, value, unit) {
+  const v = numericValue(value);
+  document.getElementById('v' + n).innerHTML =
+    (v === null ? '—' : v.toFixed(1)) + ` <span class="unit">${unit}</span>`;
+}
+function showChart(elementId, feeds, field) {
+  const valid = feeds.map(feed => numericValue(feed[field])).filter(v => v !== null);
+  const box = document.getElementById(elementId);
+  if (valid.length < 2) {
+    box.innerHTML = '<p class="muted">Waiting for at least two valid readings…</p>';
+    return;
+  }
+  const min = Math.min(...valid), max = Math.max(...valid), range = max - min || 1;
+  const points = valid.map((v, i) =>
+    `${10 + i * 580 / (valid.length - 1)},${170 - (v - min) / range * 145}`
+  ).join(' ');
+  box.innerHTML = `<svg class="chart" viewBox="0 0 600 190" role="img" aria-label="Trend chart">
+    <line x1="10" y1="170" x2="590" y2="170" stroke="#354760"/>
+    <polyline points="${points}" fill="none" stroke="#75a7ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="10" y="14" fill="#9aabc2" font-size="12">${max.toFixed(1)}</text>
+    <text x="10" y="187" fill="#9aabc2" font-size="12">${min.toFixed(1)}</text>
+  </svg>`;
+}
+function setText(id, value) {
+  document.getElementById(id).textContent = value;
+}
 
-    <section class="grid">
-      <article class="card">
-        <div class="label">Field 5 · Differential pressure</div>
-        <div class="value-line">
-          <span class="value" id="f5">--</span>
-          <span class="unit">Pa*</span>
-        </div>
-      </article>
+async function loadThingSpeak() {
+  setText('conn', 'Loading…');
+  try {
+    const response = await fetch(FEEDS_URL, {cache:'no-store'});
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!Array.isArray(data.feeds) || data.feeds.length === 0) {
+      throw new Error('No feed data returned. Confirm that channel 3521125 is public and has entries.');
+    }
+    const latest = data.feeds[data.feeds.length - 1];
 
-      <article class="card">
-        <div class="label">Field 6 · Filtration blower speed</div>
-        <div class="value-line">
-          <span class="value" id="f6">--</span>
-          <span class="unit" id="u6">raw value</span>
-        </div>
-      </article>
+    FIELDS.forEach(({n,key,unit}) => {
+      const value = latest[key];
+      showMetric(n, value, unit);
+      setText('table' + n, value == null || value === '' ? 'No data' : `${value} ${unit}`);
+    });
 
-      <article class="card">
-        <div class="label">Field 7 · System status</div>
-        <div class="value-line">
-          <span class="status-value" id="f7">Awaiting data</span>
-        </div>
-      </article>
+    const systemCode = numericValue(latest.field7);
+    const systemText = systemCode === null ? 'No data' :
+      (STATUS_NAMES[Math.round(systemCode)] || `Unknown (${latest.field7})`);
+    setText('v7', systemText);
+    setText('table7', systemCode === null ? 'No data' : `${latest.field7} — ${systemText}`);
 
-      <article class="card">
-        <div class="label">Field 8 · Cleaning status</div>
-        <div class="value-line">
-          <span class="status-value" id="f8">Awaiting data</span>
-        </div>
-      </article>
-    </section>
+    const cleaningCode = numericValue(latest.field8);
+    const cleaningText = cleaningCode === null ? 'No data' : (cleaningCode === 1 ? 'ACTIVE' : 'INACTIVE');
+    document.getElementById('v8').innerHTML = cleaningCode === null
+      ? 'No data'
+      : `<span class="badge ${cleaningCode === 1 ? 'warn' : 'ok'}">${cleaningText}</span>`;
+    setText('table8', cleaningCode === null ? 'No data' : `${latest.field8} — ${cleaningText}`);
 
-    <div class="footer">
-      <div id="updated">Last ThingSpeak entry: --</div>
-      <div id="refresh">Refresh interval: 20 seconds</div>
-      <div id="message">Waiting for the first data response.</div>
-    </div>
-  </main>
+    setText('entry', latest.entry_id ?? '—');
+    setText('time', latest.created_at ? new Date(latest.created_at).toLocaleString() : '—');
+    document.getElementById('conn').innerHTML = '<span class="badge ok">Connected</span>';
 
-  <script>
-    (() => {
-      "use strict";
+    [['c1','field1'],['c2','field2'],['c3','field3'],['c4','field4'],
+     ['c5','field5'],['c6','field6'],['c7','field7'],['c8','field8']]
+      .forEach(([elementId, field]) => showChart(elementId, data.feeds, field));
 
-      const CHANNEL_ID = "3521125";
+    setText('conn', 'Connected · updated ' + new Date().toLocaleTimeString());
+  } catch (error) {
+    setText('conn', 'Error: ' + error.message);
+  }
+}
 
-      // Leave blank for a public ThingSpeak channel.
-      // For a private channel, enter its READ API key here.
-      // Never use the ThingSpeak WRITE API key.
-      const READ_API_KEY = "";
-
-      const REFRESH_MS = 20000;
-
-      const endpoint =
-        `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1`;
-
-      const dot = document.getElementById("dot");
-      const connectionText =
-        document.getElementById("connectionText");
-      const message = document.getElementById("message");
-
-      function showConnection(state, text) {
-        dot.className = "dot" +
-          (state === "ok" ? " ok" :
-           state === "error" ? " error" : "");
-        connectionText.textContent = text;
-      }
-
-      function display(id, value) {
-        document.getElementById(id).textContent =
-          value === null || value === undefined ||
-          String(value).trim() === ""
-            ? "--"
-            : String(value);
-      }
-
-      function formatTimestamp(value) {
-        if (!value) return "--";
-
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) return value;
-
-        return date.toLocaleString();
-      }
-
-      async function updateDashboard() {
-        try {
-          // Blynk may restrict external network requests.
-          if (typeof BlynkBridge !== "undefined") {
-            const bridge = new BlynkBridge({
-              logEnabled: false,
-              isOnErrorEnabled: false
-            });
-
-            if (!bridge.isExternalRequestsAllowed()) {
-              showConnection("error", "External requests blocked");
-              message.textContent =
-                "This Blynk environment blocks direct ThingSpeak requests. " +
-                "Use an approved proxy or a supported embed.";
-              return;
-            }
-          }
-
-          const url = new URL(endpoint);
-
-          if (READ_API_KEY.trim() !== "") {
-            url.searchParams.set("api_key", READ_API_KEY.trim());
-          }
-
-          const response = await fetch(url.toString(), {
-            method: "GET",
-            cache: "no-store"
-          });
-
-          if (!response.ok) {
-            throw new Error("HTTP " + response.status);
-          }
-
-          const data = await response.json();
-
-          if (!Array.isArray(data.feeds) ||
-              data.feeds.length === 0) {
-            throw new Error(
-              "No entries found. Check channel access and logging."
-            );
-          }
-
-          const feed = data.feeds[data.feeds.length - 1];
-
-          for (let i = 1; i <= 8; i++) {
-            display("f" + i, feed["field" + i]);
-          }
-
-          document.getElementById("updated").textContent =
-            "Last ThingSpeak entry: " +
-            formatTimestamp(feed.created_at);
-
-          showConnection("ok", "ThingSpeak data received");
-          message.textContent =
-            "Latest entry loaded successfully.";
-
-        } catch (error) {
-          showConnection("error", "Unable to load ThingSpeak data");
-          message.textContent =
-            error && error.message
-              ? error.message
-              : "Check network access, channel privacy, and API key.";
-        }
-      }
-
-      updateDashboard();
-      setInterval(updateDashboard, REFRESH_MS);
-    })();
-  </script>
+loadThingSpeak();
+setInterval(loadThingSpeak, REFRESH_MS);
+</script>
 </body>
 </html>
