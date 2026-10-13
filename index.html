@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IoT Indoor Air Filtration Dashboard</title>
+<title>IoT IoT- assisted indoor air filtration system with self-cleaning PM filters</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#0b1220;color:#e8edf5;font:15px system-ui,Arial}header{padding:24px 4%;background:#101b2d;border-bottom:1px solid #293951}h1{margin:0;font-size:clamp(1.4rem,3vw,2rem)}header p,.muted{color:#9aabc2}.wrap{max-width:1400px;margin:auto;padding:22px 3%}.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}input,button{border-radius:8px;padding:11px 13px;border:1px solid #354760}input{background:#101b2d;color:white;min-width:250px}button{background:#4f8cff;color:white;font-weight:700;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:#131f32;border:1px solid #293951;border-radius:14px;padding:17px;min-width:0}.label{color:#a7b7ce;font-size:.88rem}.value{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:750;margin:12px 0;overflow-wrap:anywhere}.unit{font-size:.9rem;color:#9aabc2;font-weight:500}.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.section{margin:25px 0 12px}.chart{width:100%;height:190px}.state{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #293951}.state:last-child{border:0}.badge{display:inline-block;border-radius:99px;padding:5px 10px;background:#203650}.ok{background:#153b32;color:#9de3c4}.warn{background:#4a3520;color:#ffd39b}.note{font-size:.83rem;line-height:1.5;color:#9aabc2;margin-top:16px}@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}}@media(max-width:450px){.grid{gap:8px}.card{padding:12px}.value{font-size:1.35rem}input{width:100%;min-width:0}}
 </style></head><body>
-<header><h1>Indoor Air Filtration Dashboard</h1><p>Live ThingSpeak monitoring · Channel ID: <b>3521125</b></p></header>
+<header><h1>IoT- assisted indoor air filtration system with self-cleaning PM filters</h1><p>Live ThingSpeak monitoring · Channel ID: <b>3521125</b></p></header>
 <main class="wrap">
 <div class="bar"><input id="key" type="password" placeholder="Read API key (private channel only)"><button onclick="load()">Connect / Refresh</button><span id="status" class="muted">Loading channel…</span></div>
 <div class="grid">
@@ -17,7 +17,7 @@
 <div class="card"><div class="label">System status · Field 7</div><div class="value" id="v7" style="font-size:1.25rem">—</div><div class="muted">0 Startup · 1 Diagnostic · 2 Monitoring · 3 Cleaning · 4 UV-C · 5 Fault</div></div>
 <div class="card"><div class="label">Cleaning status · Field 8</div><div class="value" id="v8" style="font-size:1.4rem">—</div><div class="muted">0 Inactive · 1 Active</div></div>
 </div>
-<h2 class="section">All 8 ThingSpeak fields</h2>
+<h2 class="section">ThingSpeak fields</h2>
 <div class="card" style="overflow-x:auto">
 <table style="width:100%;border-collapse:collapse;text-align:left">
 <thead><tr><th style="padding:10px;border-bottom:1px solid #354760">Field</th><th style="padding:10px;border-bottom:1px solid #354760">Parameter</th><th style="padding:10px;border-bottom:1px solid #354760">Latest value</th></tr></thead>
