@@ -10,15 +10,16 @@ Do not place the Blynk device Auth Token in `index.html`. Store it as a Cloudfla
 
 ## 1. Create Blynk datastreams
 
-In Blynk Console, create five Integer datastreams with values 0–1:
+In Blynk Console, create six Integer datastreams. V0–V4 use values 0–1; V5 uses integer values 0–100:
 
 | Virtual pin | Name | Meaning |
 |---|---|---|
-| V0 | Filtration blower request | 0 OFF / 1 ON request |
+| V0 | Filtration blower relay request | 0 OFF / 1 ON request; relay switches 24 V blower supply |
 | V1 | UV-C request | 0 OFF / 1 ON request, subject to occupancy interlock |
 | V2 | Cleaning blower request | Request only; cleaning state machine must permit it |
 | V3 | Vibration request | Request only; cleaning state machine must permit it |
 | V4 | Total system request | 0 safe stop / 1 normal monitoring mode |
+| V5 | Filtration blower PWM speed | Integer 0–100 percent; firmware maps this to ESP32 PWM duty |
 
 Copy the device Auth Token for the Blynk device. Do not commit it to this repository.
 
@@ -34,9 +35,10 @@ Copy the device Auth Token for the Blynk device. Do not commit it to this reposi
 
 ## 3. ESP32 firmware integration — required before operating hardware
 
-The ESP32 firmware must connect to the same Blynk device and handle V0–V4. The handlers must set *requests*, not bypass the existing state machine:
+The ESP32 firmware must connect to the same Blynk device and handle V0–V5. The handlers must set *requests*, not bypass the existing state machine:
 
-- V0: enable/disable filtration blower, with safe PWM handling.
+- V0: operate the filtration blower relay for 24 V power ON/OFF. The blower is rated 24 V DC, 1 A (nominal 24 W); choose relay contacts based on DC load and startup current.
+- V5: accept an integer speed request from 0–100 and convert it to the configured ESP32 PWM duty for the MOSFET. Since the blower has only two power wires, this is supply-side PWM; verify the blower supports it and select a suitable PWM frequency, MOSFET/driver, suppression and fuse. Do not change the relay rapidly for PWM.
 - V1: treat as a UV-C request only. UV-C must remain OFF if occupancy is detected, the occupancy sensor is faulty, or any diagnostic/fault condition is active. Re-check occupancy continuously.
 - V2 and V3: accept manual requests only when the cleaning state machine explicitly permits them. Do not allow them to bypass suction-first timing, vibration timing, or the safe cleaning sequence.
 - V4 OFF: immediately enter the firmware's safe-stop state and turn off UV-C, vibration, and cleaning blower; stop filtration blower as appropriate for the design.
@@ -51,7 +53,7 @@ Keep ThingSpeak telemetry fields 1–8 and their 20-second upload schedule uncha
 
 1. Test first with actuators disconnected or replaced by LEDs in Wokwi.
 2. Confirm invalid token requests return 401, and unknown device/state requests are rejected.
-3. Verify Total OFF disables all outputs.
+3. Verify Total OFF invokes safe-stop logic, including relay OFF and PWM set to zero for the filtration blower.
 4. Verify UV-C cannot turn on with occupancy present or with an occupancy-sensor fault.
 5. Verify cleaning blower and vibration requests cannot bypass the programmed cleaning sequence.
 6. Only then test with the prototype hardware under supervised conditions.
